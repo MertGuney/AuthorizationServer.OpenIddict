@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  openiddict.api:
+    container_name: openiddict-api
+    build:
+      context: .
+      dockerfile: src/Presentation/AuthorizationServer.OpenIddict.Api/Dockerfile
+  openiddict.db:
+    container_name: openiddict-db
+    image: postgres
+
+volumes:
+  openiddictdb_volume:

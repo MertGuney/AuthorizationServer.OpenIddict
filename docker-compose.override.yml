@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+  openiddict.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings:DefaultConnection=User ID=postgres;Password=Password*-1;Host=openiddict.db;Port=5432;Database=AuthorizationServerDb;
+    ports:
+      - "5100:80"
+    depends_on:
+      - openiddict.db
+  openiddict.db:
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=AuthorizationServerDb
+      - POSTGRES_PASSWORD=Password*-1
+    ports:
+      - 5432:5432
+    volumes:
+      - openiddictdb_volume:/var/lib/postgresql/data
