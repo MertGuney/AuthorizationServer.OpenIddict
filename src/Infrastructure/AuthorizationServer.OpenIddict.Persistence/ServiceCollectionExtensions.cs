@@ -64,17 +64,21 @@ public static class ServiceCollectionExtensions
                     opts.UseEntityFrameworkCore().UseDbContext<AppDbContext>();
                 }).AddServer(opts =>
                 {
-                    opts.SetTokenEndpointUris("/connect/token");
+                    opts.SetTokenEndpointUris("/connect/token")
+                        .SetAuthorizationEndpointUris("/connect/authorize");
 
-                    opts.AllowPasswordFlow();
-                    opts.AllowClientCredentialsFlow();
+                    opts.AllowPasswordFlow()
+                        .AllowAuthorizationCodeFlow()
+                        .AllowClientCredentialsFlow()
+                        .RequireProofKeyForCodeExchange();
 
                     opts.AddEphemeralSigningKey()
                         .AddEphemeralEncryptionKey()
                         .DisableAccessTokenEncryption(); // for jwt.io 
 
                     opts.UseAspNetCore()
-                        .EnableTokenEndpointPassthrough();
+                        .EnableTokenEndpointPassthrough()
+                        .EnableAuthorizationEndpointPassthrough();
 
                     opts.RegisterScopes("read", "write");
                 });

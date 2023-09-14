@@ -7,6 +7,7 @@ services:
       - ConnectionStrings:DefaultConnection=User ID=postgres;Password=Password*-1;Host=openiddict.db;Port=5432;Database=AuthorizationServerDb;
     ports:
       - "5100:80"
+      - "7100:443"
     depends_on:
       - openiddict.db
   openiddict.db:

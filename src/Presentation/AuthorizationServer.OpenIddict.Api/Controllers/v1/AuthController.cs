@@ -1,14 +1,36 @@
-﻿namespace AuthorizationServer.OpenIddict.Api.Controllers.v1;
+﻿using AuthorizationServer.OpenIddict.Application.Contracts.Requests.Clients;
+
+namespace AuthorizationServer.OpenIddict.Api.Controllers.v1;
 
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/auth/[action]")]
 public class AuthController : BaseController
 {
+    private readonly ITokenManager _tokenManager;
+    private readonly IClientManager _clientManager;
     private readonly SignInManager<User> _signInManager;
-    public AuthController(IMediator mediator, SignInManager<User> signInManager) : base(mediator)
+
+    public AuthController(IMediator mediator, ITokenManager tokenManager, IClientManager clientManager, SignInManager<User> signInManager) : base(mediator)
     {
+        _tokenManager = tokenManager;
+        _clientManager = clientManager;
         _signInManager = signInManager;
+    }
+
+    [HttpPost("~/connect/token")]
+    public async Task<IActionResult> Login()
+    {
+        var claimsPrincipal = await _tokenManager.GetClaimsPrincipalAsync();
+
+        return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateClient(CreateClientRequest request)
+    {
+        await _clientManager.CreateAsync(request);
+        return Ok();
     }
 
     [HttpPost]

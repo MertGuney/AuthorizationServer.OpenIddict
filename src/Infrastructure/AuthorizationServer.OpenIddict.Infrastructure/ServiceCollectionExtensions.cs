@@ -9,10 +9,12 @@ public static class ServiceCollectionExtensions
 
     private static void AddServices(this IServiceCollection services)
     {
-        services.AddScoped<ITFAService, TFAService>();
-        services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IMailService, MailService>();
-        services.AddScoped<IQRCodeService, QRCodeService>();
+        services.AddScoped<ITFAService, TFAService>()
+                .AddScoped<IUserService, UserService>()
+                .AddScoped<IAuthService, AuthService>()
+                .AddScoped<IMailService, MailService>()
+                .AddScoped<ITokenManager, TokenManager>()
+                .AddScoped<IClientManager, ClientManager>()
+                .AddScoped<IQRCodeService, QRCodeService>();
     }
 }
