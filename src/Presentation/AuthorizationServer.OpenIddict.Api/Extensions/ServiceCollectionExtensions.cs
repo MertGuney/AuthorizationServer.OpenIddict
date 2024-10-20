@@ -9,10 +9,8 @@ public static class ServiceCollectionExtensions
             options.AddPolicy(name: corsPolicyName,
                 policy =>
                 {
-                    policy.WithOrigins(
-                        "http://localhost:3000",
-                        "http://localhost:3001"
-                        )
+                    policy.WithOrigins("http://localhost:3000",
+                                       "http://localhost:3001")
                           .AllowAnyMethod()
                           .AllowAnyHeader()
                           .AllowCredentials();

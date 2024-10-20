@@ -1,7 +1,6 @@
 ﻿global using AuthorizationServer.OpenIddict.Application.Common.Exceptions;
 global using AuthorizationServer.OpenIddict.Application.Common.Extensions;
 global using AuthorizationServer.OpenIddict.Application.Contracts.Requests.Clients;
-global using AuthorizationServer.OpenIddict.Application.Contracts.Requests.Tokens;
 global using AuthorizationServer.OpenIddict.Application.Contracts.Responses.Clients;
 global using AuthorizationServer.OpenIddict.Application.Services.Abstractions;
 global using AuthorizationServer.OpenIddict.Domain.Entities;
@@ -11,8 +10,8 @@ global using Microsoft.AspNetCore;
 global using Microsoft.AspNetCore.Hosting;
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Identity;
-global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Hosting;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.IdentityModel.JsonWebTokens;
 global using OpenIddict.Abstractions;

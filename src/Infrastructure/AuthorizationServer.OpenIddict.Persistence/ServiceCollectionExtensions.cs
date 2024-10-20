@@ -1,23 +1,35 @@
-﻿using Microsoft.AspNetCore.Hosting;
-
-namespace AuthorizationServer.OpenIddict.Persistence;
+﻿namespace AuthorizationServer.OpenIddict.Persistence;
 
 public static class ServiceCollectionExtensions
 {
-    public static void AddPersistenceLayer(this IServiceCollection services, IConfiguration configuration)
+    public static void AddPersistenceLayer(this IHostApplicationBuilder builder)
     {
-        services.AddDbContext(configuration);
-        services.AddIdentity();
-        services.AddServices();
-        services.AddRepositories();
-        services.AddEventDispatcher();
+        builder.Services.AddDbContext(builder.Configuration);
+        builder.Services.AddIdentity();
+        builder.Services.AddServices();
+        builder.Services.AddRepositories();
+        builder.Services.AddEventDispatcher();
     }
 
     private static void AddDbContext(this IServiceCollection services, IConfiguration configuration)
     {
+        NpgsqlConnectionStringBuilder connectionStringBuilder = new(configuration.GetConnectionString("DefaultConnection"))
+        {
+            Pooling = true,
+            MinPoolSize = 5,
+            MaxPoolSize = 100,
+            ConnectionIdleLifetime = 300,
+            ConnectionPruningInterval = 10
+        };
+
         services.AddDbContext<AppDbContext>(options =>
         {
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            options.UseNpgsql(connectionStringBuilder.ConnectionString, npgsqlOpts =>
+            {
+                npgsqlOpts.EnableRetryOnFailure(5, TimeSpan.FromSeconds(30), null);
+                npgsqlOpts.CommandTimeout(30);
+                npgsqlOpts.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
             options.UseOpenIddict();
         });
     }
@@ -49,11 +61,10 @@ public static class ServiceCollectionExtensions
             opts.Lockout.AllowedForNewUsers = true;
             opts.Lockout.MaxFailedAccessAttempts = 3;
             opts.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-        })
-            .AddPasswordValidator<IdentityPasswordValidator>()
-            .AddUserValidator<IdentityUserValidator>()
-            .AddEntityFrameworkStores<AppDbContext>()
-            .AddDefaultTokenProviders();
+        }).AddPasswordValidator<IdentityPasswordValidator>()
+          .AddUserValidator<IdentityUserValidator>()
+          .AddEntityFrameworkStores<AppDbContext>()
+          .AddDefaultTokenProviders();
     }
 
     public static void AddDevelopmentIdentity(this IServiceCollection services)
@@ -61,11 +72,13 @@ public static class ServiceCollectionExtensions
         services.AddOpenIddict()
                 .AddCore(opts =>
                 {
-                    opts.UseEntityFrameworkCore().UseDbContext<AppDbContext>();
+                    opts.UseEntityFrameworkCore()
+                        .UseDbContext<AppDbContext>();
                 }).AddServer(opts =>
                 {
                     opts.SetTokenEndpointUris("/connect/token")
-                        .SetAuthorizationEndpointUris("/connect/authorize");
+                        .SetAuthorizationEndpointUris("/connect/authorize")
+                        .SetUserinfoEndpointUris("connect/userinfo");
 
                     opts.AllowPasswordFlow()
                         .AllowAuthorizationCodeFlow()
@@ -74,11 +87,13 @@ public static class ServiceCollectionExtensions
 
                     opts.AddEphemeralSigningKey()
                         .AddEphemeralEncryptionKey()
-                        .DisableAccessTokenEncryption(); // for jwt.io 
+                        .DisableAccessTokenEncryption(); // for jwt.io
 
                     opts.UseAspNetCore()
                         .EnableTokenEndpointPassthrough()
-                        .EnableAuthorizationEndpointPassthrough();
+                        .EnableAuthorizationEndpointPassthrough()
+                        .EnableUserinfoEndpointPassthrough()
+                        .EnableLogoutEndpointPassthrough();
 
                     opts.RegisterScopes("read", "write");
                 });
@@ -86,6 +101,5 @@ public static class ServiceCollectionExtensions
 
     public static void AddProductionIdentity(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
     {
-
     }
 }

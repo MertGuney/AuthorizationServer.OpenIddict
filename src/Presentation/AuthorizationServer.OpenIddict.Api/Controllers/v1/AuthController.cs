@@ -1,6 +1,4 @@
-﻿using AuthorizationServer.OpenIddict.Application.Contracts.Requests.Clients;
-
-namespace AuthorizationServer.OpenIddict.Api.Controllers.v1;
+﻿namespace AuthorizationServer.OpenIddict.Api.Controllers.v1;
 
 [ApiController]
 [ApiVersion("1.0")]

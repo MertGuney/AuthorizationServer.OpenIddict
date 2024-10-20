@@ -2,13 +2,20 @@ var corsPolicyName = "IdentityServerCorsPolicy";
 
 var builder = WebApplication.CreateBuilder(args);
 
+var redis = await ConnectionMultiplexer.ConnectAsync(builder.Configuration.GetConnectionString("Redis"));
+builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
+
+builder.Services.AddDataProtection()
+                .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys")
+                .SetApplicationName("AuthorizationServer");
+
 builder.Services.ConfigureCors(corsPolicyName);
 
-builder.Services.AddApplicationLayer();
+builder.AddApplicationLayer();
 
-builder.Services.AddPersistenceLayer(builder.Configuration);
+builder.AddPersistenceLayer();
 
-builder.Services.AddInfrastructureLayer(builder.Configuration, builder.Environment);
+builder.AddInfrastructureLayer();
 
 if (builder.Environment.IsDevelopment())
 {
@@ -53,4 +60,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();

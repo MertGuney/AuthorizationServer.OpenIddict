@@ -2,19 +2,19 @@
 
 public static class ServiceCollectionExtensions
 {
-    public static void AddApplicationLayer(this IServiceCollection services)
+    public static void AddApplicationLayer(this IHostApplicationBuilder builder)
     {
-        services.AddMediator();
-        services.AddServices();
-        services.AddAutoMapper();
-        services.AddValidators();
-        services.AddFilterAttributes();
-        services.AddExceptionHandling();
-        services.AddHttpContextAccessor();
-        services.AddLoggingPipelineBehaviours();
-        services.AddValidationPipelineBehaviours();
-        services.AddPerformancePipelineBehaviours();
-        services.AddExceptionHandlerPipelineBehaviours();
+        builder.Services.AddMediator();
+        builder.Services.AddServices();
+        builder.Services.AddAutoMapper();
+        builder.Services.AddValidators();
+        builder.Services.AddFilterAttributes();
+        builder.Services.AddExceptionHandling();
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddLoggingPipelineBehaviours();
+        builder.Services.AddValidationPipelineBehaviours();
+        builder.Services.AddPerformancePipelineBehaviours();
+        builder.Services.AddExceptionHandlerPipelineBehaviours();
     }
 
     private static void AddServices(this IServiceCollection services)

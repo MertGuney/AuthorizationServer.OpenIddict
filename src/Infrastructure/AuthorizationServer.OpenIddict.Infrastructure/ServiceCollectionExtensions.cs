@@ -2,9 +2,11 @@
 
 public static class ServiceCollectionExtensions
 {
-    public static void AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
+    public static IHostApplicationBuilder AddInfrastructureLayer(this IHostApplicationBuilder builder)
     {
-        services.AddServices();
+        builder.Services.AddServices();
+
+        return builder;
     }
 
     private static void AddServices(this IServiceCollection services)
